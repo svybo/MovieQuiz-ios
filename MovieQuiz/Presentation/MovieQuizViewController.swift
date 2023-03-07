@@ -71,18 +71,31 @@ final class MovieQuizViewController: UIViewController {
     // view - модели
     
     private func show(quiz step: QuizStepViewModel) {
+        imageView.image = step.image
+                 textLabel.text = step.question
+        counterLabel.text = step.questionNumber
       // здесь мы заполняем нашу картинку, текст и счётчик данными
     }
 
     private func show(quiz result: QuizResultsViewModel) {
         // создаём объекты всплывающего окна
-        let alert = UIAlertController(title: "My Alert", // заголовок всплывающего окна
-                                      message: "This is an alert.", // текст во всплывающем окне
+        let alert = UIAlertController(title: result.title
+                                      , // заголовок всплывающего окна
+                                      message: result.text, // текст во всплывающем окне
                                       preferredStyle: .alert) // preferredStyle может быть .alert или .actionSheet
 
         // создаём для него кнопки с действиями
-        let action = UIAlertAction(title: "OK", style: .default) { _ in
-          print("OK button is clicked!")
+        let action = UIAlertAction(title: result.buttonText, style: .default) { _ in
+            self.currentQuestionIndex = 0
+
+                         //скидывем счетчик правильных ответов
+                         self.correctAnswers = 0
+
+                         //заново показывем первый вопрос
+                         let firstQuestion = self.questions[self.currentQuestionIndex]
+                         let viewModel = self.convert(model: firstQuestion)
+                         self.show(quiz: viewModel)
+            
         }
 
         // добавляем в алерт кнопки
@@ -135,6 +148,11 @@ final class MovieQuizViewController: UIViewController {
     // проверка правильности ответа
     
     private func showAnswerResult(isCorrect: Bool) {
+        if isCorrect == true{
+                     correctAnswers += 1
+            
+                 }
+        
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
@@ -168,6 +186,7 @@ final class MovieQuizViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        
        
         
         
@@ -175,7 +194,7 @@ final class MovieQuizViewController: UIViewController {
         
         // счетчик вопроса
         let currentQuestion = questions[currentQuestionIndex]
-        
+        show(quiz: convert(model: currentQuestion))
         
     }
     
